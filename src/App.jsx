@@ -1,64 +1,62 @@
- import ContactoCard from "./components/ContactoCard.jsx";
- export default function App() {
-  // Esta es nuestra "base de datos" inicial quemada en el código
-  const contactos = [
-    {
-      id: 1,
-      nombre: "Carolina Pérez",
-      telefono: "300 123 4567",
-      correo: "carolina@sena.edu.co",
-      etiqueta: "Compañera",
-    },
-    {
-      id: 2,
-      nombre: "Juan Díaz",
-      telefono: "301 987 6543",
-      correo: "juan@sena.edu.co",
-      etiqueta: "Instructor",
-    },
-    {
-      id: 3,
-      nombre: "Luisa Martínez",
-      telefono: "320 555 7788",
-      correo: "luisa@sena.edu.co",
-      etiqueta: "Cliente",
-    },
+import { useState } from "react";
+import "./App.css";
+import ContactoCard from "./components/ContactoCard";
+import FormularioContacto from "./components/FormularioContacto";
+
+export default function App() {
+  const [contactos, setContactos] = useState([
+    {
+      id: 1,
+      nombre: "Carolina Pérez",
+      telefono: "300 123 4567",
+      correo: "carolina@sena.edu.co",
+      etiqueta: "Compañera",
+    },
      {
-      id: 4,
-      nombre: "Samuel Vanegas",
-      telefono: "305 444 3322",
-      correo: "samuel@sena.edu.co",
-      etiqueta: "Compañero",
-    },
+      id: 2,
+      nombre: "Samuel Vengas",
+      telefono: "300 123 4567",
+      correo: "samuel@sena.edu.co",
+      etiqueta: "Compañero",
+    },
      {
-      id: 5,
-      nombre: "Miguel Monsalve",
-      telefono: "300 123 1234",
-      correo: "miguel@sena.edu.co",
-      etiqueta: "Compañero",
-    },
-  ];
+      id: 3,
+      nombre: "Miguel Monsalve",
+      telefono: "300 123 4567",
+      correo: "miguel@sena.edu.co",
+      etiqueta: "Compañero",
+    },
+  ]);
 
-  return (
-    <main className="app-container">
-      <h1 className="app-title">Agenda ADSO 📒</h1>
+  // Agregar
+  const agregarContacto = (nuevo) => {
+    setContactos((prev) => [...prev, { id: Date.now(), ...nuevo }]);
+  };
 
-      <p className="app-subtitle">Contactos guardados</p>
+  // Eliminar
+  const eliminarContacto = (id) => {
+    setContactos((prev) => prev.filter((c) => c.id !== id));
+  };
 
-      {/* Recorremos el arreglo contactos y pintamos una tarjeta por cada uno */}
-      {contactos.map((c) => (
-        <ContactoCard
-          key={c.id}            // key única para React
-          nombre={c.nombre}     // prop nombre
-          telefono={c.telefono} // prop telefono
-          correo={c.correo}     // prop correo
-          etiqueta={c.etiqueta} // prop etiqueta (Cliente, Instructor, etc.)
-        />
-      ))}
+  return (
+    <main className="app-container">
+      <h1 className="app-title">Agenda ADSO v2</h1>
 
-      <p className="app-nota">
-        (Versión 0.1 - solo lectura, sin agregar ni editar todavía)
-      </p>
-    </main>
-  );
+      <FormularioContacto onAgregar={agregarContacto} />
+
+      <section className="lista-contactos">
+        {contactos.map((c) => (
+          <ContactoCard
+            key={c.id}
+            id={c.id}
+            nombre={c.nombre}
+            telefono={c.telefono}
+            correo={c.correo}
+            etiqueta={c.etiqueta}
+            onDelete={eliminarContacto}
+          />
+        ))}
+      </section>
+    </main>
+  );
 }
