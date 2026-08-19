@@ -1,62 +1,42 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
-import ContactoCard from "./components/ContactoCard";
 import FormularioContacto from "./components/FormularioContacto";
+import ContactoCard from "./components/ContactoCard";
 
 export default function App() {
-  const [contactos, setContactos] = useState([
-    {
-      id: 1,
-      nombre: "Carolina Pérez",
-      telefono: "300 123 4567",
-      correo: "carolina@sena.edu.co",
-      etiqueta: "Compañera",
-    },
-     {
-      id: 2,
-      nombre: "Samuel Vengas",
-      telefono: "300 123 4567",
-      correo: "samuel@sena.edu.co",
-      etiqueta: "Compañero",
-    },
-     {
-      id: 3,
-      nombre: "Miguel Monsalve",
-      telefono: "300 123 4567",
-      correo: "miguel@sena.edu.co",
-      etiqueta: "Compañero",
-    },
-  ]);
+  const contactosGuardados =
+    JSON.parse(localStorage.getItem("contactos")) || [];
 
-  // Agregar
-  const agregarContacto = (nuevo) => {
-    setContactos((prev) => [...prev, { id: Date.now(), ...nuevo }]);
-  };
+  const [contactos, setContactos] = useState(contactosGuardados);
 
-  // Eliminar
-  const eliminarContacto = (id) => {
-    setContactos((prev) => prev.filter((c) => c.id !== id));
-  };
+  useEffect(() => {
+    localStorage.setItem("contactos", JSON.stringify(contactos));
+  }, [contactos]);
 
-  return (
-    <main className="app-container">
-      <h1 className="app-title">Agenda ADSO v2</h1>
+  const agregarContacto = (nuevo) => {
+    setContactos((prev) => [...prev, nuevo]);
+  };
 
-      <FormularioContacto onAgregar={agregarContacto} />
+  const eliminarContacto = (correo) => {
+    setContactos((prev) => prev.filter((c) => c.correo !== correo));
+  };
 
-      <section className="lista-contactos">
-        {contactos.map((c) => (
-          <ContactoCard
-            key={c.id}
-            id={c.id}
-            nombre={c.nombre}
-            telefono={c.telefono}
-            correo={c.correo}
-            etiqueta={c.etiqueta}
-            onDelete={eliminarContacto}
-          />
-        ))}
-      </section>
-    </main>
-  );
+  return (
+    <main className="app-container">
+      <h1 className="app-title">Agenda ADSO v3</h1>
+      <p className="subtitulo">
+        Persistencia con localStorage + UI moderna
+      </p>
+
+      <FormularioContacto onAgregar={agregarContacto} />
+
+      {contactos.map((c) => (
+        <ContactoCard
+          key={c.correo}
+          {...c}
+          onEliminar={eliminarContacto}
+        />
+      ))}
+    </main>
+  );
 }
