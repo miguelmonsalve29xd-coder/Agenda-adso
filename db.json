@@ -13,6 +13,13 @@
       "correo": "ejrejre@fdfds.com",
       "etiqueta": "compañero",
       "id": "DK_IFBKhsYQ"
+    },
+    {
+      "nombre": "samuelito vanegas",
+      "telefono": "1212433423",
+      "correo": "ejrejre@fdfds.com",
+      "etiqueta": "compañero",
+      "id": "nHuzeV5Z-60"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
