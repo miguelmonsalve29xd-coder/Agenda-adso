@@ -20,6 +20,20 @@
       "correo": "ejrejre@fdfds.com",
       "etiqueta": "compañero",
       "id": "nHuzeV5Z-60"
+    },
+    {
+      "nombre": "samuelito vanegas",
+      "telefono": "1212433423",
+      "correo": "ejrejre@fdfds.com",
+      "etiqueta": "compañero",
+      "id": "UZ3cLQivM2Y"
+    },
+    {
+      "nombre": "juan",
+      "telefono": "423423",
+      "correo": "ejrejre@fdfds.com",
+      "etiqueta": "compañero",
+      "id": "Tb3NU3d3w8g"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
