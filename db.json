@@ -1,39 +1,53 @@
 {
   "contactos": [
     {
-      "id": "1d3f",
-      "nombre": "Gustavo Adolfo Bolaños Dorado",
-      "telefono": "3217532037",
-      "correo": "gabodora@gmail.com",
-      "etiqueta": "profe"
-    },
-    {
       "nombre": "juan",
-      "telefono": "423423",
+      "telefono": "1212433423",
       "correo": "ejrejre@fdfds.com",
       "etiqueta": "compañero",
-      "id": "DK_IFBKhsYQ"
+      "id": "1tR16YMXkAI"
     },
     {
       "nombre": "samuelito vanegas",
       "telefono": "1212433423",
       "correo": "ejrejre@fdfds.com",
-      "etiqueta": "compañero",
-      "id": "nHuzeV5Z-60"
+      "etiqueta": "instructor",
+      "id": "xc1olv8e70o"
     },
     {
-      "nombre": "samuelito vanegas",
+      "nombre": "gustavo ",
       "telefono": "1212433423",
-      "correo": "ejrejre@fdfds.com",
-      "etiqueta": "compañero",
-      "id": "UZ3cLQivM2Y"
+      "correo": "gustavo@gmail.com",
+      "etiqueta": "instructor",
+      "id": "g7m1Qrjw9aI"
     },
     {
-      "nombre": "juan",
-      "telefono": "423423",
-      "correo": "ejrejre@fdfds.com",
+      "nombre": "gus",
+      "telefono": "222233321",
+      "correo": "gus@gmail.com",
+      "etiqueta": "instructor",
+      "id": "Bk8LYfaEIiY"
+    },
+    {
+      "nombre": "camila",
+      "telefono": "65343333",
+      "correo": "camila@gmail.com",
       "etiqueta": "compañero",
-      "id": "Tb3NU3d3w8g"
+      "id": "B3OqVcOHQ1A"
+    },
+    {
+      "nombre": "ana",
+      "telefono": "1221233333",
+      "correo": "ana@gmail.com",
+      "etiqueta": "compañero",
+      "id": "NHxyLjHQj68"
+    },
+    {
+      "nombre": "ziry",
+      "telefono": "423423",
+      "correo": "ziry@gmail.com",
+      "etiqueta": "compañero",
+      "id": "asIynf6Pj5o"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
