@@ -1,18 +1,22 @@
 // Archivo: src/App.jsx
 // Componente principal de la aplicación Agenda ADSO.
-// Se encarga de:
+// Responsabilidades:
 // - Cargar la lista de contactos desde la API (JSON Server).
 // - Manejar estados globales (contactos, carga, error).
+// - Manejar el contacto en edición.
 // - Conectar el formulario, el buscador y las tarjetas de contactos.
-// - Aplicar búsqueda y ordenamiento sobre la lista de contactos.
-// - Buscar también por teléfono.
-// - Mostrar la cantidad de contactos visibles.
+// - Aplicar búsqueda, ordenamiento y edición.
 
 // Importamos hooks de React
 import { useEffect, useState } from "react";
 
 // Importamos las funciones de la API (capa de datos)
-import { listarContactos, crearContacto, eliminarContactoPorId } from "./api";
+import {
+  listarContactos,
+  crearContacto,
+  actualizarContacto,
+  eliminarContactoPorId,
+} from "./api";
 
 // Importamos la configuración global de la aplicación
 import { APP_INFO } from "./config";
@@ -25,217 +29,208 @@ function App() {
   // Estado que almacena la lista de contactos obtenidos de la API
   const [contactos, setContactos] = useState([]);
 
-  // Estado que indica si estamos cargando información
+  // Estado que indica si estamos cargando información (por ejemplo, al inicio)
   const [cargando, setCargando] = useState(true);
 
-  // Estado para guardar mensajes de error generales
+  // Estado para guardar mensajes de error generales de la aplicación
   const [error, setError] = useState("");
-
-  // =====================================================
-  // ESTADOS PARA BÚSQUEDA Y ORDENAMIENTO
-  // =====================================================
 
   // Estado para el término de búsqueda digitado por el usuario
   const [busqueda, setBusqueda] = useState("");
 
-  // Estado para controlar el orden:
-  // true = A-Z
-  // false = Z-A
+  // Estado para el orden de los contactos: true = A-Z, false = Z-A
   const [ordenAsc, setOrdenAsc] = useState(true);
 
-  // =====================================================
-  // CARGAR CONTACTOS DESDE JSON SERVER
-  // =====================================================
+  // Estado para saber qué contacto estamos editando (o null si no editamos)
+  const [contactoEnEdicion, setContactoEnEdicion] = useState(null);
 
+  // useEffect que se ejecuta una sola vez al montar el componente.
+  // Aquí cargamos los contactos iniciales desde JSON Server (GET).
   useEffect(() => {
     const cargarContactos = async () => {
       try {
-        setCargando(true);
-        setError("");
+        setCargando(true); // Indicamos que estamos cargando
+        setError(""); // Limpiamos posibles errores anteriores
 
-        // Llamamos a la API
-        const data = await listarContactos();
-
-        // Guardamos los contactos
-        setContactos(data);
+        const data = await listarContactos(); // Llamamos a la API
+        setContactos(data); // Guardamos la lista de contactos en el estado
       } catch (error) {
+        // En caso de error, lo registramos en consola para depuración
         console.error("Error al cargar contactos:", error);
 
+        // Y mostramos un mensaje amigable al usuario
         setError(
-          "No se pudieron cargar los contactos. Verifica que el servidor esté encendido e intenta de nuevo.",
+          "No se pudieron cargar los contactos. Verifica que el servidor esté encendido e intenta de nuevo."
         );
       } finally {
-        setCargando(false);
+        setCargando(false); // Finalizamos el estado de carga
       }
     };
 
     cargarContactos();
   }, []);
 
-  // =====================================================
-  // AGREGAR CONTACTO
-  // =====================================================
-
+  // Función que se encarga de agregar un nuevo contacto usando la API (CREATE)
   const onAgregarContacto = async (nuevoContacto) => {
     try {
+      // Limpiamos cualquier error previo antes de intentar guardar
       setError("");
 
-      // Creamos el contacto en JSON Server
+      // Llamamos al servicio que crea el contacto en JSON Server
       const creado = await crearContacto(nuevoContacto);
 
-      // Agregamos el nuevo contacto al estado
+      // Actualizamos el estado agregando el contacto recién creado a la lista
       setContactos((prev) => [...prev, creado]);
     } catch (error) {
+      // Mostramos el error en consola para facilitar la depuración
       console.error("Error al crear contacto:", error);
 
+      // Si falla la creación, mostramos un mensaje claro y útil
       setError(
-        "No se pudo guardar el contacto. Verifica tu conexión o el estado del servidor e intenta nuevamente.",
+        "No se pudo guardar el contacto. Verifica tu conexión o el estado del servidor e intenta nuevamente."
       );
 
+      // Relanzar el error permite que el formulario también pueda reaccionar
       throw error;
     }
   };
 
-  // =====================================================
-  // ELIMINAR CONTACTO
-  // =====================================================
+  // Función para actualizar un contacto (UPDATE)
+  const onActualizarContacto = async (contactoActualizado) => {
+    try {
+      setError(""); // Limpiamos errores previos
 
+      // Llamamos a la API para actualizar el contacto por id
+      const actualizado = await actualizarContacto(
+        contactoActualizado.id,
+        contactoActualizado
+      );
+
+      // Recorremos la lista y reemplazamos el contacto que coincida por id
+      setContactos((prev) =>
+        prev.map((c) => (c.id === actualizado.id ? actualizado : c))
+      );
+
+      // Limpiamos el contacto en edición (salimos de modo edición)
+      setContactoEnEdicion(null);
+    } catch (error) {
+      console.error("Error al actualizar contacto:", error);
+      setError(
+        "No se pudo actualizar el contacto. Verifica tu conexión o el servidor e intenta nuevamente."
+      );
+      throw error;
+    }
+  };
+
+  // Función para eliminar un contacto por su id (DELETE)
   const onEliminarContacto = async (id) => {
     try {
-      setError("");
+      setError(""); // Limpiamos errores previos
+      await eliminarContactoPorId(id); // Llamamos al servicio de eliminación
 
-      // Eliminamos el contacto de la API
-      await eliminarContactoPorId(id);
-
-      // Eliminamos el contacto del estado local
+      // Filtramos el contacto eliminado de la lista local
       setContactos((prev) => prev.filter((c) => c.id !== id));
+
+      // Si el contacto que se elimina estaba en edición, cancelamos la edición
+      setContactoEnEdicion((actual) =>
+        actual && actual.id === id ? null : actual
+      );
     } catch (error) {
+      // Mostramos el error en consola para depurar
       console.error("Error al eliminar contacto:", error);
 
+      // Si algo falla al eliminar, informamos al usuario
       setError(
-        "No se pudo eliminar el contacto. Vuelve a intentarlo o verifica el servidor.",
+        "No se pudo eliminar el contacto. Vuelve a intentarlo o verifica el servidor."
       );
     }
   };
 
-  // =====================================================
-  // FILTRO DE CONTACTOS
-  // =====================================================
+  // Función para activar el modo edición al hacer clic en "Editar"
+  const onEditarClick = (contacto) => {
+    setContactoEnEdicion(contacto); // Guardamos el contacto que se va a editar
+    setError(""); // Limpiamos posibles errores previos
+  };
 
+  // Función para cancelar la edición y volver a modo "crear"
+  const onCancelarEdicion = () => {
+    setContactoEnEdicion(null);
+  };
+
+  // === LÓGICA DE BÚSQUEDA Y ORDENAMIENTO (Clase 10) ===
+
+  // 1. Filtramos la lista original según el término de búsqueda
   const contactosFiltrados = contactos.filter((c) => {
-    // Convertimos la búsqueda a minúsculas
     const termino = busqueda.toLowerCase();
-
-    // Convertimos nombre a minúsculas
-    const nombre = (c.nombre || "").toLowerCase();
-
-    // Convertimos correo a minúsculas
-    const correo = (c.correo || "").toLowerCase();
-
-    // Convertimos etiqueta a minúsculas
+    const nombre = c.nombre.toLowerCase();
+    const correo = c.correo.toLowerCase();
     const etiqueta = (c.etiqueta || "").toLowerCase();
 
-    // Convertimos teléfono a texto
-    // Esto permite buscar números como "321"
-    const telefono = String(c.telefono || "").toLowerCase();
-
-    // El contacto aparece si la búsqueda coincide con:
-    // nombre, correo, etiqueta o teléfono
     return (
       nombre.includes(termino) ||
       correo.includes(termino) ||
-      etiqueta.includes(termino) ||
-      telefono.includes(termino)
+      etiqueta.includes(termino)
     );
   });
 
-  // =====================================================
-  // ORDENAMIENTO
-  // =====================================================
-
-  // Creamos una COPIA del arreglo antes de utilizar sort()
-  // para no modificar directamente el estado original.
+  // 2. Ordenamos los contactos filtrados por nombre
   const contactosOrdenados = [...contactosFiltrados].sort((a, b) => {
-    // Convertimos los nombres a minúsculas
-    const nombreA = (a.nombre || "").toLowerCase();
-    const nombreB = (b.nombre || "").toLowerCase();
+    const nombreA = a.nombre.toLowerCase();
+    const nombreB = b.nombre.toLowerCase();
 
-    // Orden A-Z
-    if (nombreA < nombreB) {
-      return ordenAsc ? -1 : 1;
-    }
-
-    // Orden Z-A
-    if (nombreA > nombreB) {
-      return ordenAsc ? 1 : -1;
-    }
-
-    // Si los nombres son iguales
+    if (nombreA < nombreB) return ordenAsc ? -1 : 1;
+    if (nombreA > nombreB) return ordenAsc ? 1 : -1;
     return 0;
   });
 
-  // =====================================================
-  // INTERFAZ
-  // =====================================================
-
+  // JSX que renderiza toda la aplicación
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Contenedor principal centrado */}
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* =====================================================
-            ENCABEZADO
-        ===================================================== */}
-
+        {/* Encabezado principal de la Agenda usando la configuración global */}
         <header className="mb-8">
           <p className="text-xs tracking-[0.3em] text-gray-500 uppercase">
             Desarrollo Web ReactJS Ficha {APP_INFO.ficha}
           </p>
-
           <h1 className="text-4xl font-extrabold text-gray-900 mt-2">
             {APP_INFO.titulo}
           </h1>
-
-          <p className="text-sm text-gray-600 mt-1">{APP_INFO.subtitulo}</p>
+          <p className="text-sm text-gray-600 mt-1">
+            {APP_INFO.subtitulo}
+          </p>
         </header>
 
-        {/* =====================================================
-            MENSAJE DE ERROR
-        ===================================================== */}
-
+        {/* Si hay un error global, lo mostramos en un recuadro rojo */}
         {error && (
           <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3">
             <p className="text-sm font-medium text-red-700">{error}</p>
           </div>
         )}
 
-        {/* =====================================================
-            CARGANDO
-        ===================================================== */}
-
+        {/* Si estamos cargando, mostramos un mensaje de carga */}
         {cargando ? (
           <p className="text-sm text-gray-500">Cargando contactos...</p>
         ) : (
           <>
-            {/* =====================================================
-                FORMULARIO PARA CREAR CONTACTOS
-            ===================================================== */}
+            {/* Formulario para crear o editar contactos */}
+            <FormularioContacto
+              onAgregar={onAgregarContacto}
+              onActualizar={onActualizarContacto}
+              contactoEnEdicion={contactoEnEdicion}
+              onCancelarEdicion={onCancelarEdicion}
+            />
 
-            <FormularioContacto onAgregar={onAgregarContacto} />
-
-            {/* =====================================================
-                BUSCADOR Y ORDENAMIENTO
-            ===================================================== */}
-
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-2">
-              {/* Campo de búsqueda controlado */}
+            {/* Buscador y botón de orden */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
               <input
                 type="text"
                 className="w-full md:flex-1 rounded-xl border-gray-300 focus:ring-purple-500 focus:border-purple-500 text-sm"
-                placeholder="Buscar por nombre, correo, etiqueta o teléfono..."
+                placeholder="Buscar por nombre, correo o etiqueta..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />
 
-              {/* Botón para cambiar A-Z / Z-A */}
               <button
                 type="button"
                 onClick={() => setOrdenAsc((prev) => !prev)}
@@ -245,26 +240,13 @@ function App() {
               </button>
             </div>
 
-            {/* =====================================================
-                CONTADOR DE RESULTADOS
-            ===================================================== */}
-
-            <p className="text-sm text-gray-600 mb-4">
-              Mostrando {contactosOrdenados.length} contacto(s)
-            </p>
-
-            {/* =====================================================
-                LISTA DE CONTACTOS
-            ===================================================== */}
-
+            {/* Listado de contactos (usa contactosOrdenados) */}
             <section className="space-y-4">
               {contactosOrdenados.length === 0 ? (
-                // Si no hay resultados
                 <p className="text-sm text-gray-500">
                   No se encontraron contactos que coincidan con la búsqueda.
                 </p>
               ) : (
-                // Mostramos los contactos filtrados y ordenados
                 contactosOrdenados.map((c) => (
                   <ContactoCard
                     key={c.id}
@@ -273,6 +255,7 @@ function App() {
                     correo={c.correo}
                     etiqueta={c.etiqueta}
                     onEliminar={() => onEliminarContacto(c.id)}
+                    onEditar={() => onEditarClick(c)}
                   />
                 ))
               )}
@@ -280,13 +263,9 @@ function App() {
           </>
         )}
 
-        {/* =====================================================
-            PIE DE PÁGINA
-        ===================================================== */}
-
+        {/* Pie de página con los datos del instructor */}
         <footer className="mt-8 text-xs text-gray-400">
           <p>Desarrollo Web – ReactJS | Proyecto Agenda ADSO</p>
-
           <p>Instructor: Gustavo Adolfo Bolaños Dorado</p>
         </footer>
       </div>

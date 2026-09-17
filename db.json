@@ -1,13 +1,6 @@
 {
   "contactos": [
     {
-      "nombre": "juan",
-      "telefono": "1212433423",
-      "correo": "ejrejre@fdfds.com",
-      "etiqueta": "compañero",
-      "id": "1tR16YMXkAI"
-    },
-    {
       "nombre": "samuelito vanegas",
       "telefono": "1212433423",
       "correo": "ejrejre@fdfds.com",
@@ -15,39 +8,18 @@
       "id": "xc1olv8e70o"
     },
     {
-      "nombre": "gustavo ",
-      "telefono": "1212433423",
-      "correo": "gustavo@gmail.com",
-      "etiqueta": "instructor",
-      "id": "g7m1Qrjw9aI"
-    },
-    {
-      "nombre": "gus",
-      "telefono": "222233321",
-      "correo": "gus@gmail.com",
-      "etiqueta": "instructor",
-      "id": "Bk8LYfaEIiY"
-    },
-    {
-      "nombre": "camila",
-      "telefono": "65343333",
-      "correo": "camila@gmail.com",
-      "etiqueta": "compañero",
-      "id": "B3OqVcOHQ1A"
-    },
-    {
-      "nombre": "ana",
-      "telefono": "1221233333",
-      "correo": "ana@gmail.com",
-      "etiqueta": "compañero",
-      "id": "NHxyLjHQj68"
-    },
-    {
       "nombre": "ziry",
       "telefono": "423423",
       "correo": "ziry@gmail.com",
       "etiqueta": "compañero",
       "id": "asIynf6Pj5o"
+    },
+    {
+      "nombre": "Ana",
+      "telefono": "1221233333",
+      "correo": "ana@gmail.com",
+      "etiqueta": "compañero",
+      "id": "DkAzOWrJSI0"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
